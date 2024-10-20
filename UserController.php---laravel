@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\User; // Import the User model
+use Illuminate\Support\Facades\Hash; // For password hashing
+
+class UserController extends Controller
+{
+    // Store a new user
+    public function store(Request $request)
+    {
+        // Validate the form data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        // Create a new user instance
+        $user = new User();
+        $user->name = $validatedData['name'];
+        $user->email = $validatedData['email'];
+        $user->password = Hash::make($validatedData['password']); // Hash the password before saving
+        $user->save(); // Save the user to the database
+
+        // Redirect or return a response (e.g., success message or redirect to another page)
+        return redirect()->back()->with('success', 'User created successfully!');
+    }
+}
